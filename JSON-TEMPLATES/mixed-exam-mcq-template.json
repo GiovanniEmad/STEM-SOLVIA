@@ -1,0 +1,43 @@
+{
+ "exam": {
+  "title": "Grade 11 Physics Examination",
+  "description": "Historical examination paper",
+  "grade": "Grade 11",
+  "subject": "Physics",
+  "academic_year": "2025-2026",
+  "semester": "First Semester",
+  "duration_minutes": null,
+  "total_marks": 1,
+  "difficulty": "Medium"
+ },
+ "questions": [
+  {
+   "question_id": "PHY001",
+   "question_text": "Which law relates voltage, current and resistance?",
+   "question_type": "MCQ",
+   "options": [
+    {
+     "id": "A",
+     "text": "Newton's First Law"
+    },
+    {
+     "id": "B",
+     "text": "Ohm's Law"
+    },
+    {
+     "id": "C",
+     "text": "Faraday's Law"
+    },
+    {
+     "id": "D",
+     "text": "Hooke's Law"
+    }
+   ],
+   "correct_answer": "B",
+   "explanation": "V = I R.",
+   "marks": 1,
+   "difficulty": "Easy",
+   "topic": "Electricity"
+  }
+ ]
+}

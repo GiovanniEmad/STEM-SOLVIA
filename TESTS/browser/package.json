@@ -1,0 +1,1 @@
+{"name":"stem-solvia-e2e","private":true,"type":"module","dependencies":{"@sparticuz/chromium":"^131.0.0","axe-core":"^4.10.0","puppeteer-core":"^23.0.0"}}

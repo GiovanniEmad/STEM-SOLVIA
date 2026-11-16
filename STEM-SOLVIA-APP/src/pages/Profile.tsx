@@ -1,0 +1,11 @@
+import {useEffect,useState} from 'react';import {supabase} from '../lib/supabase';import {rpc} from '../lib/api';
+export default function Profile(){const[p,setP]=useState<any>(null),[email,setEmail]=useState(''),[sc,setSc]=useState<any[]>([]),[pend,setPend]=useState<any>(null),[f,setF]=useState({name:'',phone:'',school:'',grade:'10'}),[msg,setMsg]=useState('');
+ const load=async()=>{const{data:{user}}=await supabase.auth.getUser();setEmail(user?.email||'');const r=await supabase.from('profiles').select('full_name,phone,grade,created_at,school_id,schools(name)').eq('id',user!.id).single();setP(r.data);if(r.data)setF({name:r.data.full_name,phone:r.data.phone,school:r.data.school_id,grade:String(r.data.grade)});
+  supabase.from('schools').select('id,name').eq('active',true).order('name').then(x=>setSc(x.data||[]));supabase.from('profile_requests').select('status,grade').eq('status','pending').then(x=>setPend(x.data?.[0]||null));};
+ useEffect(()=>{load();},[]);const run=async(fn:string,a:any,ok:string)=>{try{await rpc(fn,a);setMsg(ok);load();}catch(e:any){setMsg(e.message);}};
+ if(!p)return<main>Loading…</main>;
+ return<main><h1>Profile</h1><div className="card"><p>{email}</p><p className="mut">{p.schools?.name} · Grade {p.grade} · Joined {new Date(p.created_at).toLocaleDateString()}</p>
+ <label>Full name<input value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></label> <label>Phone<input value={f.phone} onChange={e=>setF({...f,phone:e.target.value})}/></label> <button onClick={()=>run('update_profile',{p_name:f.name,p_phone:f.phone},'Saved')}>Save</button></div>
+ <h2>Change school or grade</h2><p className="mut">Requires administrator approval.</p>{pend&&<p>A request is pending.</p>}
+ <select aria-label="School" value={f.school} onChange={e=>setF({...f,school:e.target.value})}>{sc.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select> <select aria-label="Grade" value={f.grade} onChange={e=>setF({...f,grade:e.target.value})}><option>10</option><option>11</option><option>12</option></select> <button onClick={()=>run('request_change',{p_school:f.school,p_grade:+f.grade},'Request sent')}>Request change</button>
+ <p role="status">{msg}</p></main>;}

@@ -1,0 +1,14 @@
+import {useEffect,useState} from 'react';import {supabase} from '../lib/supabase';import {rpc} from '../lib/api';import {RichText,Img} from '../components/ui';
+export default function Practice(){const[subs,setSubs]=useState<any[]>([]),[f,setF]=useState({s:'',t:'',w:false}),[qs,setQs]=useState<any[]>([]),[i,setI]=useState(0),[fb,setFb]=useState<Record<string,any>>({}),[err,setErr]=useState(''),[started,setStarted]=useState(false);
+ useEffect(()=>{supabase.from('subjects').select('id,name').then(r=>setSubs(r.data||[]));},[]);
+ async function start(){setErr('');try{const d=await rpc<any[]>('practice_set',{p_subject:f.s||null,p_topic:f.t,p_wrong:f.w,p_collection:new URLSearchParams(location.search).get('c'),p_limit:10});setQs(d);setI(0);setFb({});setStarted(true);}catch(e:any){setErr(e.message);}}
+ async function pick(q:any,o:string){if(fb[q.id])return;try{setFb({...fb,[q.id]:{...(await rpc('practice_check',{p_q:q.id,p_opt:o})),chosen:o}});}catch(e:any){setErr(e.message);}}
+ async function bm(id:string){const r=await supabase.from('bookmarks').insert({question_id:id});setErr(r.error&&!r.error.message.includes('duplicate')?r.error.message:'');}
+ const q=qs[i];
+ return<main><h1>Practice</h1><p className="mut">No timer, no submission. Feedback appears after each answer for exams where practice is enabled.</p>
+ <select aria-label="Subject" value={f.s} onChange={e=>setF({...f,s:e.target.value})}><option value="">All subjects</option>{subs.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select> <input aria-label="Topic" placeholder="Topic (optional)" value={f.t} onChange={e=>setF({...f,t:e.target.value})}/> <label><input type="checkbox" checked={f.w} onChange={e=>setF({...f,w:e.target.checked})}/> Retry my incorrect questions</label> <button onClick={start}>Start</button>
+ {err&&<p role="alert">{err}</p>}{started&&!qs.length&&<p>No practice questions match.</p>}
+ {q&&<section className="card" style={{marginTop:12}}><h2>{i+1}/{qs.length} <RichText text={q.text}/></h2><Img path={q.image_path}/>
+  {q.options.map((o:any)=>{const x=fb[q.id];const st=x?(o.opt_id===x.correct_opt?'#2a9d5c55':o.opt_id===x.chosen?'#d6454555':''):'';return<label key={o.opt_id} style={{display:'block',padding:8,margin:4,border:'1px solid var(--bd)',borderRadius:6,background:st}}><input type="radio" name={q.id} disabled={!!x} checked={x?.chosen===o.opt_id} onChange={()=>pick(q,o.opt_id)}/> {o.opt_id}. <RichText text={o.text}/><Img path={o.image_path}/></label>;})}
+  {fb[q.id]&&<p><b>{fb[q.id].correct?'Correct':'Incorrect'}</b> {fb[q.id].explanation&&<RichText text={fb[q.id].explanation}/>}</p>}
+  <button onClick={()=>bm(q.id)}>Bookmark</button> <button disabled={i===0} onClick={()=>setI(i-1)}>Previous</button> <button disabled={i>=qs.length-1} onClick={()=>setI(i+1)}>Next</button></section>}</main>;}

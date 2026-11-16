@@ -1,0 +1,2 @@
+# JSON import
+Format: see JSON-TEMPLATES/mcq-template.json. `exam.subject` must match an existing subject name; `exam.grade` is "Grade 10/11/12". Every question: question_type "MCQ", unique question_id, >=2 uniquely-id'd options, correct_answer = one option id, marks > 0. Validation runs in the browser and again in the database; one bad question rejects the whole file. `image_path` is stored but image upload/rendering is not implemented.

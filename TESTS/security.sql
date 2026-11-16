@@ -1,0 +1,7 @@
+-- NOT RUN. Execute in the Supabase SQL editor as a seeded student (set role authenticated; set request.jwt.claims ...).
+-- Each statement below must FAIL (permission denied / RLS violation):
+-- insert into student_answers values (gen_random_uuid(), gen_random_uuid(), 'A');
+-- update exam_attempts set score=999;
+-- select * from question_keys;
+-- insert into user_roles values (auth.uid(),'super_admin');
+-- select save_answer('<other student attempt>','<q>','A');
